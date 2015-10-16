@@ -23,21 +23,24 @@ public:
 		int width = stdscr->_maxx;
 		int height = stdscr->_maxy;
 		bool resize = false;
-		resize |= getInt(L, &width, "width");
-		resize |= getInt(L, &height, "height");
+		resize |= get(L, &width, "width");
+		resize |= get(L, &height, "height");
 		if (resize)
 			resize_term(width, height);
 
-
 		const char* title = "";
-		if (getString(L, &title, "title"))
+		if (get(L, &title, "title"))
 			PDC_set_title(title);
+
+		bool hideCursor;
+		if (get(L, &hideCursor, "cursor"))
+			curs_set(hideCursor);
 
 		lua_close(L);
 	}
 
 private:
-	static bool getInt(lua_State* L, int* result, const char* name) {
+	static bool get(lua_State* L, int* result, const char* name) {
 		lua_getglobal(L, name);
 		bool ret = false;
 		if (lua_isnumber(L, -1)) {
@@ -48,11 +51,22 @@ private:
 		return ret;
 	}
 
-	static bool getString(lua_State* L, const char** result, const char* name) {
+	static bool get(lua_State* L, const char** result, const char* name) {
 		lua_getglobal(L, name);
 		bool ret = false;
 		if (lua_isstring(L, -1)) {
 			*result = lua_tostring(L, -1);
+			ret = true;
+		}
+		lua_pop(L, 1);
+		return ret;
+	}
+
+	static bool get(lua_State* L, bool* result, const char* name) {
+		lua_getglobal(L, name);
+		bool ret = false;
+		if (lua_isboolean(L, -1)) {
+			*result = lua_toboolean(L, -1);
 			ret = true;
 		}
 		lua_pop(L, 1);
