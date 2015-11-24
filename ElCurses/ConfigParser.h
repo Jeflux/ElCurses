@@ -26,13 +26,13 @@ public:
 		resize |= get(L, &width, "width");
 		resize |= get(L, &height, "height");
 		if (resize)
-			resize_term(width, height);
+			resize_term(height, width);
 
 		const char* title = "";
 		if (get(L, &title, "title"))
 			PDC_set_title(title);
 
-		bool hideCursor;
+		bool hideCursor = false;
 		if (get(L, &hideCursor, "cursor"))
 			curs_set(hideCursor);
 
